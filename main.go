@@ -5,33 +5,19 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"0-shell/commands"
 )
 
+var prompt = "0-Shell> "
+
 func main() {
-	reader := bufio.NewReader(os.Stdin)
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print(prompt)
+	for scanner.Scan() {
 
-	for {
-		fmt.Print("$ ")
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			if err.Error() == "EOF" {
-				os.Exit(0)
-			}
-			continue
-		}
+		input := scanner.Text()
+		args := strings.Fields(input)
+		fmt.Println(args)
 
-		input = strings.TrimSpace(input)
-
-		if input == "exit" {
-			os.Exit(0)
-		}
-
-		err = commands.ExecuteCommand(input)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
+		fmt.Print(prompt)
 	}
 }

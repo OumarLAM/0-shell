@@ -1,8 +1,8 @@
-package commands;
+package commands
 
 import "fmt"
 
-func ExecuteCommand(input string) error {
+func ExecuteCommand(args []string) error {
 	// TODO: Implement command execution
 	fmt.Println("Executing command:", input)
 	return nil
