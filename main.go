@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"0-shell/commands"
+	"github.com/OumarLAM/0-shell/pkg"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 			os.Exit(0)
 		}
 
-		err = commands.ExecuteCommand(input)
+		err = pkg.ExecuteCommand(input)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
