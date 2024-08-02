@@ -13,11 +13,20 @@ func ExecuteCommand(input string) error {
 		return Echo(args)
 	case "cd":
 		return Cd(args)
+	case "ls":
+		return Ls()
 	case "pwd":
 		return Pwd()
-	// TODO: Add other commands
+	case "cat":
+		return Cat()
+	case "cp":
+		return Cp()
+	case "rm":
+		return Rm()
+	case "mkdir":
+		return Mkdir()
 	default:
-		return fmt.Errorf("command not found: %s", cmd)
+		return fmt.Errorf("command %s not found: ", cmd)
 	}
 }
 
