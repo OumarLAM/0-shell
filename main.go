@@ -18,7 +18,11 @@ func main() {
 
 		input := scanner.Text()
 		args := strings.Fields(input)
-		fmt.Println(args)
+		if len(args) > 0 {
+			if err := pkg.ExecuteCommand(args); err != nil {
+				fmt.Println(err.Error())
+			}
+		}
 
 		fmt.Print(prompt)
 	}
