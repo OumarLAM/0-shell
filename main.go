@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/OumarLAM/0-shell/pkg"
 )
 
 var prompt = "0-Shell> "
