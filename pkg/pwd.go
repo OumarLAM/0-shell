@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func Pwd() error {
+func pwd() error {
 	dir, err := os.Getwd()
 	if err != nil {
 		return err

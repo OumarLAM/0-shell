@@ -2,7 +2,7 @@ package pkg
 
 import "os"
 
-func Cd(args []string) error {
+func cd(args []string) error {
 	if len(args) == 0 {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {

@@ -10,23 +10,25 @@ func ExecuteCommand(input string) error {
 
 	switch cmd {
 	case "echo":
-		return Echo(args)
+		return echo(args)
 	case "cd":
-		return Cd(args)
+		return cd(args)
 	case "ls":
-		return Ls()
+		return ls(args)
 	case "pwd":
-		return Pwd()
+		return pwd()
 	case "cat":
-		return Cat()
+		return cat(args)
 	case "cp":
-		return Cp()
+		return cp(args)
 	case "rm":
-		return Rm()
+		return rm(args)
+	case "mv":
+		return mv(args)
 	case "mkdir":
-		return Mkdir()
+		return mkdir(args)
 	default:
-		return fmt.Errorf("command %s not found: ", cmd)
+		return fmt.Errorf("\x1b[31mcommand `%s` not found\x1b[0m", cmd)
 	}
 }
 

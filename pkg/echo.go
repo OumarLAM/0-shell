@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func Echo(args []string) error {
+func echo(args []string) error {
 	fmt.Println(strings.Join(args, " "))
 	return nil
 }

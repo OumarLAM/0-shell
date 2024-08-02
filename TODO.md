@@ -14,14 +14,14 @@
   - [x] Repeats
 
 ## 3. Command Parsing
-- [ ] Implement a function to parse user input into command and arguments
-- [ ] Handle quoting and escaping in command arguments
+- [x] Implement a function to parse user input into command and arguments
+- [x] Handle quoting and escaping in command arguments
 
 ## 4. Built-in Commands Implementation
-- [ ] echo
-- [ ] cd
+- [x] echo
+- [x] cd
 - [ ] ls (with -l, -a, -F flags)
-- [ ] pwd
+- [x] pwd
 - [ ] cat
 - [ ] cp
 - [ ] rm (with -r flag)
