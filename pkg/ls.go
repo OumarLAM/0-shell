@@ -44,6 +44,10 @@ func listDirectory(args []string) error {
 		return fmt.Errorf("\x1b[31mls: %v\x1b[0m", err)
 	}
 
+	if showAll {
+		fmt.Println(".")
+		fmt.Println("..")
+	}
 	// Display the files based on the options
 	for _, entry := range files {
 		if !showAll && strings.HasPrefix(entry.Name(), ".") {
