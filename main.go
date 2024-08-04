@@ -67,8 +67,8 @@ func main() {
 	for scanner.Scan() {
 		input := scanner.Text()
 		// Vérifier chaque caractère pour gérer les guillemets
-		for _, char := range input {
-			if char == '"' || char == '\'' {
+		for i, char := range input {
+			if (char == '"' || char == '\'') && (i == 0 || input[i-1] != '\\') {
 				if inQuotes && char == quoteChar {
 					inQuotes = false // Fermeture du guillemet trouvé
 				} else if !inQuotes {
@@ -93,7 +93,7 @@ func main() {
 
 		args := strings.Fields(multilineInput)
 		if len(args) > 0 {
-			if err := pkg.ExecuteCommand(args); err != nil {
+			if err := pkg.ExecuteCommand(args, multilineInput); err != nil {
 				fmt.Println(err.Error())
 			}
 		}

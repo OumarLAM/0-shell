@@ -6,10 +6,10 @@ import (
 	"strings"
 )
 
-func ExecuteCommand(args []string) error {
+func ExecuteCommand(args []string, input string) error {
 	switch args[0] {
 	case "echo":
-		fmt.Println(strings.Join(args[1:], " "))
+		fmt.Println(strings.TrimPrefix(input, "echo "))
 		return nil
 	case "cd":
 		return changeDirectory(args[1:])

@@ -4,17 +4,21 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 func copyFiles(args []string) error {
-	if len(args) < 2 {
-		return fmt.Errorf("\x1b[31mcp: missing file operand\x1b[0m")
+
+	// sourcePath := args[0]
+	destPath := args[len(args)-1]
+
+	for _, sourcePath := range args[:len(args)-1] {
+		if err := copy(sourcePath, destPath); err != nil {
+			return err
+		}
 	}
 
-	sourcePath := args[0]
-	destPath := args[1]
-
-	return copy(sourcePath, destPath)
+	return nil
 }
 
 func copy(src, dst string) error {
@@ -31,18 +35,40 @@ func copy(src, dst string) error {
 }
 
 func copyFile(src, dst string) error {
+	// Open the source file
 	sourceFile, err := os.Open(src)
 	if err != nil {
 		return err
 	}
 	defer sourceFile.Close()
 
+	// Check if the destination exists and determine the nature
+	info, err := os.Stat(dst)
+	if err == nil {
+		if info.IsDir() {
+			// If dst is a directory, append the src filename to the dst directory
+			dst = filepath.Join(dst, filepath.Base(src))
+		}
+	} else if !os.IsNotExist(err) {
+		if filepath.Ext(dst) == "" {
+			// No extension, treat as a directory
+			err = os.MkdirAll(dst, 0755)
+			if err != nil {
+				return err
+			}
+			// Set the destination to a new file inside the newly created directory
+			dst = filepath.Join(dst, filepath.Base(src))
+		}
+	}
+
+	// Create the destination file
 	destFile, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
 	defer destFile.Close()
 
+	// Perform the file copy
 	_, err = io.Copy(destFile, sourceFile)
 	return err
 }

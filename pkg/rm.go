@@ -3,6 +3,7 @@ package pkg
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 func removeFiles(args []string) error {
@@ -14,13 +15,23 @@ func removeFiles(args []string) error {
 	files := []string{}
 
 	// Check if the second argument is "-r"
-	if len(args) > 0 && args[0] == "-r" {
-		recursive = true
-		// Append all files, skipping the second argument
-		files = append(files, args[1:]...)
-	} else {
-		// All arguments are considered as files
-		files = args
+	// if len(args) > 0 && args[0] == "-r" {
+	// 	recursive = true
+	// 	// Append all files, skipping the second argument
+	// 	files = append(files, args[1:]...)
+	// } else {
+	// 	// All arguments are considered as files
+	// 	files = args
+	// }
+
+	for _, arg := range args {
+		if strings.HasPrefix(arg, "-") {
+			if strings.Contains(arg, "r") {
+				recursive = true
+			}
+		} else {
+			files = append(files, arg)
+		}
 	}
 
 	if len(files) == 0 {
