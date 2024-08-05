@@ -2,31 +2,38 @@ package pkg
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
-func ExecuteCommand(input string) error {
+func ExecuteCommand(arguments []string, input string) error {
 	cmd, args := ParseCommand(input)
 
 	switch cmd {
 	case "echo":
 		return echo(args)
 	case "cd":
-		return cd(args)
+		return changeDirectory(args)
 	case "ls":
-		return ls(args)
+		return listDirectory(args)
 	case "pwd":
-		return pwd()
+		return printWorkingDirectory()
 	case "cat":
-		return cat(args)
+		return concatenateFiles(args)
 	case "cp":
-		return cp(args)
+		return copyFiles(args)
 	case "rm":
-		return rm(args)
+		return removeFiles(args)
 	case "mv":
-		return mv(args)
+		return moveFiles(args)
 	case "mkdir":
-		return mkdir(args)
+		return makeDirectory(args)
+	case "exit":
+		os.Exit(0)
+		return nil
+	case "clear":
+		clear()
+		return nil
 	default:
 		return fmt.Errorf("\x1b[31mcommand `%s` not found\x1b[0m", cmd)
 	}

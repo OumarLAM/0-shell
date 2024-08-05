@@ -2,26 +2,21 @@ package pkg
 
 import (
 	"fmt"
-	"io"
 	"os"
 )
 
-func cat(args []string) error {
+func concatenateFiles(args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("cat: missing file operand")
+		return fmt.Errorf("\x1b[31mcat: missing file operand\x1b[0m")
 	}
 
 	for _, filename := range args {
-		file, err := os.Open(filename)
+		data, err := os.ReadFile(filename)
 		if err != nil {
-			return err
+			return fmt.Errorf("\x1b[31mcat: %v\x1b[0m", err)
 		}
-		defer file.Close()
-
-		_, err = io.Copy(os.Stdout, file)
-		if err != nil {
-			return err
-		}
+		fmt.Print(string(data))
 	}
+
 	return nil
 }

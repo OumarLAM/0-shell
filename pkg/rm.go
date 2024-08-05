@@ -3,34 +3,62 @@ package pkg
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
-func rm(args []string) error {
-	var recursive bool
-	var paths []string
+func removeFiles(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("\x1b[31mrm: missing operand\x1b[0m")
+	}
+
+	recursive := false
+	files := []string{}
 
 	for _, arg := range args {
-		if arg == "-r" {
-			recursive = true
+		if strings.HasPrefix(arg, "-") {
+			if strings.Contains(arg, "r") {
+				recursive = true
+			}
 		} else {
-			paths = append(paths, arg)
+			files = append(files, arg)
 		}
 	}
 
-	if len(paths) == 0 {
-		return fmt.Errorf("rm: missing operand")
+	if len(files) == 0 {
+		return fmt.Errorf("\x1b[31mrm: missing file operand\x1b[0m")
 	}
 
-	for _, path := range paths {
-		var err error
-		if recursive {
-			err = os.RemoveAll(path)
-		} else {
-			err = os.Remove(path)
-		}
+	for _, file := range files {
+		err := remove(file, recursive)
 		if err != nil {
-			return err
+			return fmt.Errorf("\x1b[31mrm: %v\x1b[0m", err)
 		}
+	}
+
+	return nil
+}
+
+func remove(path string, recursive bool) error {
+	info, err := os.Stat(path)
+	if err != nil {
+		return fmt.Errorf("\x1b[31mrm: %v\x1b[0m", err)
+	}
+
+	if !info.IsDir() {
+		err = os.Remove(path)
+		if err != nil {
+			return fmt.Errorf("\x1b[31mrm: %v\x1b[0m", err)
+		}
+		return nil
+	}
+
+	if !recursive {
+		return fmt.Errorf("\x1b[31mrm: cannot remove '%s': Is a directory\x1b[0m", path)
+	}
+
+	err = os.RemoveAll(path)
+	if err != nil {
+		return fmt.Errorf("\x1b[31mrm: %v\x1b[0m", err)
 	}
 	return nil
 }
