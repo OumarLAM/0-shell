@@ -20,20 +20,20 @@
 ## 4. Built-in Commands Implementation
 - [x] echo
 - [x] cd
-- [ ] ls (with -l, -a, -F flags)
+- [x] ls (with -l, -a, -F flags)
 - [x] pwd
-- [ ] cat
-- [ ] cp
-- [ ] rm (with -r flag)
-- [ ] mv
-- [ ] mkdir
+- [x] cat
+- [x] cp
+- [x] rm (with -r flag)
+- [x] mv
+- [x] mkdir
 
 ## 5. Error Handling
-- [ ] Implement error handling for each command
-- [ ] Display appropriate error messages
+- [x] Implement error handling for each command
+- [x] Display appropriate error messages
 
 ## 6. Signal Handling
-- [ ] Implement Ctrl+D (EOF) handling to exit the shell
+- [x] Implement Ctrl+D (EOF) handling to exit the shell
 
 ## 7. Testing
 - [ ] Write unit tests for each command
@@ -49,3 +49,8 @@
 ## Next Steps
 1. Add error handling for each command
 2. Implement the flags for ls (-l, -a, -F) and rm (-r)
+3. TODO: 
+- Sort the result of ls into alphabetical order like the normal ls
+- Display total ...... in the first line when doing a ls -l 
+- Add auto complete when we're writing the commands
+- Add piping
