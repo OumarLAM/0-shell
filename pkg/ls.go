@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	"github.com/OumarLAM/0-shell/utils"
 )
 
 type pathData struct {
@@ -58,14 +60,14 @@ func listDirectory(args []string) error {
 		pathinfo := new(pathData)
 		files, err := os.ReadDir(path)
 		if err != nil {
-			return fmt.Errorf("\x1b[31mls: %v\x1b[0m", err)
+			return utils.FormatError("ls: %v", err)
 		}
 
 		if showAll {
 			pathinfo.fils = append(pathinfo.fils, ".")
 			dir, err := os.Getwd()
 			if err != nil {
-				return fmt.Errorf("ls: %v", err)
+				return utils.FormatError("ls: %v", err)
 			}
 			
 			if dir != "/" {
@@ -86,12 +88,12 @@ func listDirectory(args []string) error {
 
 	for path, pathinfo := range allPathsFils {
 		if len(allPathsFils) != 1 {
-			fmt.Println(path)
+			fmt.Println(path + ":")
 		}
 		updateColumnSizes(pathinfo)
 		displayFiles(pathinfo, longListing, showType)
 	}
-
+	
 	return nil
 }
 
@@ -99,18 +101,18 @@ func fetchFileDetails(path string, showType bool) (*fileDetails, error) {
 	fullPath := filepath.Join(".", path)
 	fi, err := os.Stat(fullPath)
 	if err != nil {
-		return nil, fmt.Errorf("error getting info for %s: %v", fullPath, err)
+		return nil, utils.FormatError("error getting info for %s: %v", fullPath, err)
 	}
 	stat := fi.Sys().(*syscall.Stat_t)
 
 	usr, err := user.LookupId(fmt.Sprint(stat.Uid))
 	if err != nil {
-		return nil, fmt.Errorf("error looking up user ID %d: %v", stat.Uid, err)
+		return nil, utils.FormatError("error looking up user ID %d: %v", stat.Uid, err)
 	}
 
 	grp, err := user.LookupGroupId(fmt.Sprint(stat.Gid))
 	if err != nil {
-		return nil, fmt.Errorf("error looking up group ID %d: %v", stat.Gid, err)
+		return nil, utils.FormatError("error looking up group ID %d: %v", stat.Gid, err)
 	}
 
 	details := &fileDetails{
@@ -158,7 +160,7 @@ func updateColumnSizes(data *pathData) error {
 	for _, path := range data.fils {
 		details, err := fetchFileDetails(path, false)
 		if err != nil {
-			return err
+			return utils.FormatError(err.Error())
 		}
 
 		values := []string{
@@ -182,10 +184,22 @@ func updateColumnSizes(data *pathData) error {
 }
 
 func displayFiles(data *pathData, longListing, showType bool) error {
+	if longListing {
+		total := 0
+		for _, path := range data.fils {
+			details, err := fetchFileDetails(path, false)
+			if err != nil {
+				return utils.FormatError(err.Error())
+			}
+			total += details.fileCount
+		}
+		fmt.Printf("total %d\n", total)
+	}
+
 	for _, path := range data.fils {
 		details, err := fetchFileDetails(path, showType)
 		if err != nil {
-			return err
+			return utils.FormatError(err.Error())
 		}
 
 		if longListing {

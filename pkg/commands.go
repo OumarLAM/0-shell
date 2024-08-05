@@ -1,9 +1,10 @@
 package pkg
 
 import (
-	"fmt"
 	"os"
 	"strings"
+
+	"github.com/OumarLAM/0-shell/utils"
 )
 
 func ExecuteCommand(arguments []string, input string) error {
@@ -28,6 +29,21 @@ func ExecuteCommand(arguments []string, input string) error {
 		return moveFiles(args)
 	case "mkdir":
 		return makeDirectory(args)
+	case "chmod":
+		if len(arguments) < 3 {
+			return utils.FormatError("chmod: missing operand")
+		}
+		return ParseAndApplyChmod(arguments[1], arguments[2:])
+	case "touch":
+		if len(arguments) < 2 {
+			return utils.FormatError("touch: missing file operand")
+		}
+		for _, filename := range arguments[1:] {
+			if err := touchFile(filename); err != nil {
+				return utils.FormatError("touch: %v", err)
+			}
+		}
+		return nil
 	case "exit":
 		os.Exit(0)
 		return nil
@@ -35,7 +51,7 @@ func ExecuteCommand(arguments []string, input string) error {
 		clear()
 		return nil
 	default:
-		return fmt.Errorf("\x1b[31mcommand `%s` not found\x1b[0m", cmd)
+		return utils.FormatError("command `%s` not found", args[0])
 	}
 }
 
