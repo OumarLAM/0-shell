@@ -1,14 +1,15 @@
 package pkg
 
 import (
-	"fmt"
 	"os"
 	"strings"
+
+	"github.com/OumarLAM/0-shell/utils"
 )
 
 func removeFiles(args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("\x1b[31mrm: missing operand\x1b[0m")
+		return utils.FormatError("rm: missing operand")
 	}
 
 	recursive := false
@@ -35,13 +36,13 @@ func removeFiles(args []string) error {
 	}
 
 	if len(files) == 0 {
-		return fmt.Errorf("\x1b[31mrm: missing file operand\x1b[0m")
+		return utils.FormatError("rm: missing file operand")
 	}
 
 	for _, file := range files {
 		err := remove(file, recursive)
 		if err != nil {
-			return fmt.Errorf("\x1b[31mrm: %v\x1b[0m", err)
+			return utils.FormatError("rm: %v", err)
 		}
 	}
 
@@ -51,24 +52,24 @@ func removeFiles(args []string) error {
 func remove(path string, recursive bool) error {
 	info, err := os.Stat(path)
 	if err != nil {
-		return fmt.Errorf("\x1b[31mrm: %v\x1b[0m", err)
+		return utils.FormatError("rm: %v", err)
 	}
 
 	if !info.IsDir() {
 		err = os.Remove(path)
 		if err != nil {
-			return fmt.Errorf("\x1b[31mrm: %v\x1b[0m", err)
+			return utils.FormatError("rm: %v", err)
 		}
 		return nil
 	}
 
 	if !recursive {
-		return fmt.Errorf("\x1b[31mrm: cannot remove '%s': Is a directory\x1b[0m", path)
+		return utils.FormatError("rm: cannot remove '%s': Is a directory", path)
 	}
 
 	err = os.RemoveAll(path)
 	if err != nil {
-		return fmt.Errorf("\x1b[31mrm: %v\x1b[0m", err)
+		return utils.FormatError("rm: %v", err)
 	}
 	return nil
 }

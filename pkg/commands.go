@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/OumarLAM/0-shell/utils"
 )
 
 func ExecuteCommand(args []string, input string) error {
@@ -16,7 +18,7 @@ func ExecuteCommand(args []string, input string) error {
 	case "pwd":
 		dir, err := os.Getwd()
 		if err != nil {
-			return fmt.Errorf("pwd: %v", err)
+			return utils.FormatError("pwd: %v", err)
 		}
 		fmt.Println(dir)
 		return nil
@@ -32,9 +34,24 @@ func ExecuteCommand(args []string, input string) error {
 		return moveFiles(args[1:])
 	case "mkdir":
 		if len(args) < 2 {
-			return fmt.Errorf("mkdir: missing operand")
+			return utils.FormatError("mkdir: missing operand")
 		}
 		return os.Mkdir(args[1], 0755)
+	case "chmod":
+		if len(args) < 3 {
+			return utils.FormatError("chmod: missing operand")
+		}
+		return ParseAndApplyChmod(args[1], args[2:])
+	case "touch":
+		if len(args) < 2 {
+			return utils.FormatError("touch: missing file operand")
+		}
+		for _, filename := range args[1:] {
+			if err := touchFile(filename); err != nil {
+				return utils.FormatError("touch: %v", err)
+			}
+		}
+		return nil
 	case "exit":
 		os.Exit(0)
 		return nil
@@ -42,6 +59,7 @@ func ExecuteCommand(args []string, input string) error {
 		clear()
 		return nil
 	default:
-		return fmt.Errorf("\x1b[31mcommand `%s` not found\x1b[0m", args[0])
+
+		return utils.FormatError("command `%s` not found", args[0])
 	}
 }

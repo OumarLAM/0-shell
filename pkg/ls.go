@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	"github.com/OumarLAM/0-shell/utils"
 )
 
 type pathData struct {
@@ -71,14 +73,14 @@ func listDirectory(args []string) error {
 		// Read the directory contents using os.ReadDir
 		files, err := os.ReadDir(path)
 		if err != nil {
-			return fmt.Errorf("\x1b[31mls: %v\x1b[0m", err)
+			return utils.FormatError("ls: %v", err)
 		}
 
 		if showAll {
 			pathinfo.fils = append(pathinfo.fils, ".")
 			dir, err := os.Getwd()
 			if err != nil {
-				return fmt.Errorf("ls: %v", err)
+				return utils.FormatError("ls: %v", err)
 			}
 			if dir != "/" {
 				pathinfo.fils = append(pathinfo.fils, "..")
@@ -98,7 +100,7 @@ func listDirectory(args []string) error {
 
 	for path, pathinfo := range allPathsFils {
 		if len(allPathsFils) != 1 {
-			fmt.Println(path)
+			fmt.Println(path + ":")
 		}
 		updateColumnSizes(pathinfo)
 		displayFiles(pathinfo, longListing, showType)
@@ -111,17 +113,17 @@ func fetchFileDetails(path string, showType bool) (*fileDetails, error) {
 	fullPath := filepath.Join(".", path)
 	fi, err := os.Stat(fullPath)
 	if err != nil {
-		return nil, fmt.Errorf("error getting info for %s: %v", fullPath, err)
+		return nil, utils.FormatError("error getting info for %s: %v", fullPath, err)
 	}
 	stat := fi.Sys().(*syscall.Stat_t)
 
 	usr, err := user.LookupId(fmt.Sprint(stat.Uid))
 	if err != nil {
-		return nil, fmt.Errorf("error looking up user ID %d: %v", stat.Uid, err)
+		return nil, utils.FormatError("error looking up user ID %d: %v", stat.Uid, err)
 	}
 	grp, err := user.LookupGroupId(fmt.Sprint(stat.Gid))
 	if err != nil {
-		return nil, fmt.Errorf("error looking up group ID %d: %v", stat.Gid, err)
+		return nil, utils.FormatError("error looking up group ID %d: %v", stat.Gid, err)
 	}
 
 	details := &fileDetails{
@@ -131,11 +133,11 @@ func fetchFileDetails(path string, showType bool) (*fileDetails, error) {
 		size:        fi.Size(),
 		modTime:     fi.ModTime().Format("Jan 2 15:04"),
 		path:        fullPath,
-		displayPath: fullPath,
+		displayPath: filepath.Base(fullPath),
 		fileCount:   1,
 	}
 	if fi.IsDir() {
-		details.displayPath = fmt.Sprintf("\x1b[34m%s\x1b[0m", fullPath)
+		details.displayPath = fmt.Sprintf("\x1b[34m%s\x1b[0m", filepath.Base(fullPath))
 		files, err := os.ReadDir(fullPath)
 		if err == nil {
 			// details.fileCount = len(files) // Compte tous les fichiers et dossiers
@@ -169,7 +171,7 @@ func updateColumnSizes(data *pathData) error {
 	for _, path := range data.fils {
 		details, err := fetchFileDetails(path, false)
 		if err != nil {
-			return err
+			return utils.FormatError(err.Error())
 		}
 
 		values := []string{
@@ -193,17 +195,37 @@ func updateColumnSizes(data *pathData) error {
 
 // displayFiles displays file information using the maximum column sizes
 func displayFiles(data *pathData, longListing, showType bool) error {
+	if longListing {
+		total := 0
+		for _, path := range data.fils {
+			details, err := fetchFileDetails(path, false)
+			if err != nil {
+				return utils.FormatError(err.Error())
+			}
+			total += details.fileCount
+		}
+		fmt.Printf("total %d\n", total)
+	}
+
 	for _, path := range data.fils {
 		details, err := fetchFileDetails(path, showType)
 		if err != nil {
-			return err
+			return utils.FormatError(err.Error())
 		}
+		// println("****>", details.displayPath,"=", dir+"/")
+		// if strings.HasPrefix(details.displayPath, dir+"/") {
+		// 	println("===>", details.displayPath)
+		// 	name := strings.TrimPrefix(details.displayPath, dir)
+		// 	if name != "" {
+		// 		details.displayPath = name
+		// 	}
+		// }
 
 		if longListing {
 			fmt.Printf(
 				fmt.Sprintf("%%-%dv %%-%dd %%-%ds %%-%ds %%-%dv %%-%ds %%s%%s\n",
 					data.colone_max_size[0], data.colone_max_size[1], data.colone_max_size[2],
-					data.colone_max_size[3], data.colone_max_size[4],data.colone_max_size[5]),
+					data.colone_max_size[3], data.colone_max_size[4], data.colone_max_size[5]),
 				details.mode, details.fileCount, details.username, details.groupName, details.size, details.modTime, details.displayPath, details.fileTypeInd)
 		} else {
 			fmt.Print(details.displayPath + details.fileTypeInd + "  ")
