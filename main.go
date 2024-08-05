@@ -83,6 +83,7 @@ func main() {
 			multilineInput = strings.Replace(multilineInput, string(quoteChar), "", -1)
 		}
 
+		multilineInput = strings.TrimSpace(multilineInput)
 		args := strings.Fields(multilineInput)
 		if len(args) > 0 {
 			if err := pkg.ExecuteCommand(args, multilineInput); err != nil {
