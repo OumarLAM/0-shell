@@ -51,7 +51,7 @@ func ExecuteCommand(arguments []string, input string) error {
 		clear()
 		return nil
 	default:
-		return utils.FormatError("command `%s` not found", args[0])
+		return utils.FormatError("command `%s` not found", arguments[0])
 	}
 }
 
