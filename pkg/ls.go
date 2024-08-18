@@ -26,6 +26,7 @@ type fileDetails struct {
 	displayPath string
 	fileTypeInd string
 	fileCount   int
+	blockSize   int64
 }
 
 func listDirectory(args []string) error {
@@ -69,7 +70,7 @@ func listDirectory(args []string) error {
 			if err != nil {
 				return utils.FormatError("ls: %v", err)
 			}
-			
+
 			if dir != "/" {
 				pathinfo.fils = append(pathinfo.fils, "..")
 			}
@@ -93,15 +94,14 @@ func listDirectory(args []string) error {
 		updateColumnSizes(pathinfo)
 		displayFiles(pathinfo, longListing, showType)
 	}
-	
+
 	return nil
 }
 
 func fetchFileDetails(path string, showType bool) (*fileDetails, error) {
-	fullPath := filepath.Join(".", path)
-	fi, err := os.Stat(fullPath)
+	fi, err := os.Stat(path)
 	if err != nil {
-		return nil, utils.FormatError("error getting info for %s: %v", fullPath, err)
+		return nil, utils.FormatError("error getting info for %s: %v", path, err)
 	}
 	stat := fi.Sys().(*syscall.Stat_t)
 
@@ -121,14 +121,15 @@ func fetchFileDetails(path string, showType bool) (*fileDetails, error) {
 		groupName:   grp.Name,
 		size:        fi.Size(),
 		modTime:     fi.ModTime().Format("Jan 2 15:04"),
-		path:        fullPath,
-		displayPath: fullPath,
+		path:        path,
 		fileCount:   1,
+		displayPath: path,
+		blockSize:   int64(stat.Blocks),
 	}
 
 	if fi.IsDir() {
-		details.displayPath = fmt.Sprintf("\x1b[34m%s\x1b[0m", fullPath)
-		files, err := os.ReadDir(fullPath)
+		details.displayPath = fmt.Sprintf("\x1b[34m%s\x1b[0m", path)
+		files, err := os.ReadDir(path)
 		if err == nil {
 			for _, file := range files {
 				if file.IsDir() {
@@ -185,15 +186,15 @@ func updateColumnSizes(data *pathData) error {
 
 func displayFiles(data *pathData, longListing, showType bool) error {
 	if longListing {
-		total := 0
+		totalBlocks := int64(0)
 		for _, path := range data.fils {
 			details, err := fetchFileDetails(path, false)
 			if err != nil {
 				return utils.FormatError(err.Error())
 			}
-			total += details.fileCount
+			totalBlocks += details.blockSize
 		}
-		fmt.Printf("total %d\n", total)
+		fmt.Printf("total %d\n", totalBlocks/2)
 	}
 
 	for _, path := range data.fils {
